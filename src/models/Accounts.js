@@ -55,7 +55,7 @@ const accountTransactionSchema = new mongoose.Schema(
     dueDate: { type: Date },
     paymentDate: { type: Date },
 
-    bankAccountId: { type: mongoose.Schema.Types.ObjectId, ref: "BankAccount" },
+    // bankAccountId: { type: mongoose.Schema.Types.ObjectId, ref: "BankAccount" },// 
 
     notes: { type: String },
   },
