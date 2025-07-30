@@ -17,7 +17,7 @@ const CompanySchema = new mongoose.Schema(
       country: { type: String, required: true },
     },
     phone : { type: String, required: true },
-    email : { type: String, required: true, unique: true },
+    email : { type: String, required: true, },
     website: { type: String, required: true },
     gstNumber: { type: String, unique: true, sparse: true }, // GST registration number
     bankDetails: {
