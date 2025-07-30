@@ -1,33 +1,77 @@
 const mongoose = require("mongoose");
 
-const itemSchema = new mongoose.Schema({    
-    description: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    rate: { type: Number, required: true },
-    taxRate: { type: Number, default: 0 }, // % GST rate
-    taxAmount: { type: Number, default: 0 }, // calculated value
-    rebateAmount: { type: Number, default: 0 }, // used in project costing
-    total: { type: Number, required: true }, // (quantity * rate) + tax - rebate
-    });
+// Work item schema for line entries in invoice
+const ItemSchema = new mongoose.Schema({
+  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" }, // Refers to Category collection
+  title: { type: String, required: true },
+  workDescription: { type: String },
+  quantity: { type: Number, default: 1 },
+  amount: { type: Number, required: true }
+}, { _id: false });
 
-const invoiceSchema = new mongoose.Schema(
-    {
-        invoiceNumber: { type: String, unique: true, required: true }, // Unique invoice number
-        companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true }, // Reference to Company
-        items: [itemSchema], // Array of invoice items
-        subtotal: { type: Number, required: true }, // Subtotal amount
-        totalTax: { type: Number, default: 0 }, // Total tax amount
-        totalAmount: { type: Number, required: true }, // Total amount after tax and discounts
-        issueDate: { type: Date, default: Date.now }, // Invoice issue date
-        dueDate: { type: Date, required: true }, // Due date for payment
-        status: {
-            type: String,
-            enum: ["paid", "unpaid", "partial", "overdue"],
-            default: "unpaid",
-        }, // Invoice status
-        notes: { type: String }, // Additional notes or comments
-    },
-    { timestamps: true }
-);
-const Invoice = mongoose.model("Invoice", invoiceSchema);
+// Embedded customer details (dynamic)
+const CustomerInfoSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  nricLast4: { type: String },
+  contactNumber: { type: String },
+  email: { type: String },
+  address: { type: String },
+  postalCode: { type: String }
+}, { _id: false });
+
+// Terms and Conditions block
+const TermsSchema = new mongoose.Schema({
+  prices: String,
+  downpayments: String,
+  quality: String,
+  paymentTerms: String,
+  warranty: String,
+  confidentiality: String,
+  mediation: String
+}, { _id: false });
+
+// Signature info block
+const SignatureSchema = new mongoose.Schema({
+  contractor: {
+    name: { type: String },
+    signatureUrl: { type: String }
+  },
+  customer: {
+    name: { type: String },
+    agreed: { type: Boolean, default: false },
+    signatureUrl: { type: String }
+  }
+}, { _id: false });
+
+// Main Invoice Schema
+const InvoiceSchema = new mongoose.Schema({
+  referenceNo: { type: String, required: true, unique: true },
+  company: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
+  customer: CustomerInfoSchema,
+  date: { type: Date, default: Date.now },
+  hdbLicense: { type: String },
+
+  items: [ItemSchema],
+  subTotal: { type: Number, required: true },
+  gst: { type: Number, required: true }, // e.g. 9%
+  grandTotal: { type: Number, required: true },
+
+  paymentMethods: {
+    paynowKey: String,
+    internetTransfer: String,
+    cheque: String
+  },
+
+  terms: TermsSchema,
+  signatures: SignatureSchema,
+  notes: { type: String },
+
+  status: {
+    type: String,
+    enum: ["draft", "sent", "confirmed", "completed", "cancelled"],
+    default: "draft"
+  }
+}, { timestamps: true });
+
+const Invoice = mongoose.model("Invoice", InvoiceSchema);
 module.exports = Invoice;
