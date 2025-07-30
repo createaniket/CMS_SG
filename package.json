@@ -6,13 +6,11 @@
     "mongoose": "^8.16.2"
   },
   
-  "scripts": {
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "start": "node index.js",
+  "dev": "nodemon index.js",
+  "build": "echo 'no build step'"
+}
 
-    "test": "echo \"Error: no test specified\" && exit 1",
-
-    "start": "node index.js",
-
-    "dev": "nodemon index.js"
-
-  }
 }
