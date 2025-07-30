@@ -26,11 +26,15 @@ app.use(express.urlencoded({ extended: true }));
 console.log("i am her two");
 
 const categoryRoutes = require("./src/routes/category");
-const companyRoutes = require("./src/routes/category");
+const companyRoutes = require("./src/routes/company");
+const invoiceRoutes = require("./src/routes/invoice");
+
 
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/company", companyRoutes);
+app.use("/api/invoice", invoiceRoutes);
+
 
 
 console.log("i am her jwlnce");
